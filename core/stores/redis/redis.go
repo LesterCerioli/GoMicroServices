@@ -9,6 +9,7 @@ import (
 	"time"
 
 	red "github.com/go-redis/redis/v8"
+
 	"github.com/zeromicro/go-zero/core/breaker"
 	"github.com/zeromicro/go-zero/core/mapping"
 	"github.com/zeromicro/go-zero/core/syncx"
@@ -55,6 +56,7 @@ type (
 		Type string
 		Pass string
 		tls  bool
+		db   uint
 		brk  breaker.Breaker
 	}
 
@@ -131,6 +133,7 @@ func newRedis(addr string, opts ...Option) *Redis {
 		Addr: addr,
 		Type: NodeType,
 		brk:  breaker.NewBreaker(),
+		db:   defaultDatabase,
 	}
 
 	for _, opt := range opts {
@@ -2745,6 +2748,13 @@ func SetSlowThreshold(threshold time.Duration) {
 func WithPass(pass string) Option {
 	return func(r *Redis) {
 		r.Pass = pass
+	}
+}
+
+// WithDB customizes the given Redis with given database.
+func WithDB(db uint) Option {
+	return func(r *Redis) {
+		r.db = db
 	}
 }
 
