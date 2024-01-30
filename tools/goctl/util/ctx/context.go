@@ -40,6 +40,23 @@ func Prepare(workDir string) (*ProjectContext, error) {
 	return background(workDir)
 }
 
+// PrepareBasedOnModule checks the project which module belongs to,and returns the path and module.
+// workDir parameter is the directory of the source of generating code,
+// module parameter is the module name of the project,
+// where can be found the project path and the project module,
+func PrepareBasedOnModule(workDir, module string) (*ProjectContext, error) {
+	ctx, err := background(workDir)
+	if err == nil {
+		return ctx, nil
+	}
+
+	_, err = execx.Run("go mod init "+module, workDir)
+	if err != nil {
+		return nil, err
+	}
+	return background(workDir)
+}
+
 func background(workDir string) (*ProjectContext, error) {
 	isGoMod, err := IsGoMod(workDir)
 	if err != nil {

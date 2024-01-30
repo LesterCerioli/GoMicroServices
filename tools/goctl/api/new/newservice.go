@@ -27,6 +27,8 @@ var (
 	VarStringBranch string
 	// VarStringStyle describes the style of output files.
 	VarStringStyle string
+	// VarStringModule describes the go.mod module name.
+	VarStringModule string
 )
 
 // CreateServiceCommand fast create service
@@ -83,6 +85,6 @@ func CreateServiceCommand(_ *cobra.Command, args []string) error {
 		return err
 	}
 
-	err = gogen.DoGenProject(apiFilePath, abs, VarStringStyle)
+	err = gogen.DoGenProject(apiFilePath, abs, VarStringModule, VarStringStyle)
 	return err
 }
