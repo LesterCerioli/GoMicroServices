@@ -13,6 +13,7 @@ import (
 	"github.com/zeromicro/go-zero/tools/goctl/pkg/env"
 	"github.com/zeromicro/go-zero/tools/goctl/rpc/execx"
 	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
+	"golang.org/x/mod/modfile"
 )
 
 var (
@@ -48,6 +49,8 @@ var (
 	noStructTagApi string
 	//go:embed testdata/nest_type_api.api
 	nestTypeApi string
+	//go:embed testdata/test_api_service.api
+	apiSericeApi string
 )
 
 func TestParser(t *testing.T) {
@@ -267,12 +270,39 @@ func TestCamelStyle(t *testing.T) {
 	validateWithCamel(t, filename, "GoZero")
 }
 
+func TestCustomModule(t *testing.T) {
+	dir := "demo"
+	filename := "greet.api"
+	err := os.WriteFile(filename, []byte(apiSericeApi), os.ModePerm)
+	assert.Nil(t, err)
+	defer os.RemoveAll(filename)
+
+	module := "custom-module"
+	defer func() {
+		_ = os.RemoveAll(dir)
+	}()
+
+	err = DoGenProject(filename, dir, module, "gozero")
+	assert.Nil(t, err)
+
+	err = initCustomMod(dir, module)
+	assert.Nil(t, err)
+
+	modFile := filepath.Join(".", dir, "go.mod")
+	modBytes, err := os.ReadFile(modFile)
+	assert.Nil(t, err)
+	goMod, err := modfile.Parse(modFile, modBytes, nil)
+	assert.Nil(t, err)
+	assert.Equal(t, goMod.Module.Syntax.Token[1], module)
+}
+
 func validate(t *testing.T, api string) {
 	validateWithCamel(t, api, "gozero")
 }
 
 func validateWithCamel(t *testing.T, api, camel string) {
 	dir := "workspace"
+	module := ""
 	defer func() {
 		os.RemoveAll(dir)
 	}()
@@ -280,7 +310,7 @@ func validateWithCamel(t *testing.T, api, camel string) {
 	assert.Nil(t, err)
 	err = initMod(dir)
 	assert.Nil(t, err)
-	err = DoGenProject(api, dir, camel)
+	err = DoGenProject(api, dir, module, camel)
 	assert.Nil(t, err)
 	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if strings.HasSuffix(path, ".go") {
@@ -294,6 +324,11 @@ func validateWithCamel(t *testing.T, api, camel string) {
 
 func initMod(mod string) error {
 	_, err := execx.Run("go mod init "+mod, mod)
+	return err
+}
+
+func initCustomMod(dir, mod string) error {
+	_, err := execx.Run("go mod init "+mod, dir)
 	return err
 }
 

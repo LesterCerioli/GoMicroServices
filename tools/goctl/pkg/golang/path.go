@@ -8,13 +8,18 @@ import (
 	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
 )
 
-func GetParentPackage(dir string) (string, error) {
+func GetParentPackage(dir, module string) (string, error) {
 	abs, err := filepath.Abs(dir)
 	if err != nil {
 		return "", err
 	}
 
-	projectCtx, err := ctx.Prepare(abs)
+	var projectCtx *ctx.ProjectContext
+	if module != "" {
+		projectCtx, err = ctx.PrepareBasedOnModule(abs, module)
+	} else {
+		projectCtx, err = ctx.Prepare(abs)
+	}
 	if err != nil {
 		return "", err
 	}

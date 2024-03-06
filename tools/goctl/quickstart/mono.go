@@ -41,6 +41,7 @@ func initAPIFlags() error {
 
 	gogen.VarStringDir = apiWorkDir
 	gogen.VarStringAPI = apiFilename
+	gogen.VarStringModule = "greet"
 	return nil
 }
 
@@ -65,17 +66,17 @@ func (m mono) createAPIProject() {
 	configPath := filepath.Join(apiWorkDir, "internal", "config")
 	svcPath := filepath.Join(apiWorkDir, "internal", "svc")
 	typesPath := filepath.Join(apiWorkDir, "internal", "types")
-	svcPkg, err := golang.GetParentPackage(svcPath)
+	svcPkg, err := golang.GetParentPackage(svcPath, gogen.VarStringModule)
 	logx.Must(err)
-	typesPkg, err := golang.GetParentPackage(typesPath)
+	typesPkg, err := golang.GetParentPackage(typesPath, gogen.VarStringModule)
 	logx.Must(err)
-	configPkg, err := golang.GetParentPackage(configPath)
+	configPkg, err := golang.GetParentPackage(configPath, gogen.VarStringModule)
 	logx.Must(err)
 
 	var rpcClientPkg string
 	if m.callRPC {
 		rpcClientPath := filepath.Join(rpcWorkDir, "greet")
-		rpcClientPkg, err = golang.GetParentPackage(rpcClientPath)
+		rpcClientPkg, err = golang.GetParentPackage(rpcClientPath, gogen.VarStringModule)
 		logx.Must(err)
 	}
 
