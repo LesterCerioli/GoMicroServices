@@ -20,7 +20,7 @@ require (
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/spaolacci/murmur3 v1.1.0
 	github.com/stretchr/testify v1.10.0
-	go.etcd.io/etcd/api/v3 v3.5.15
+	go.etcd.io/etcd/api/v3 v3.5.17
 	go.etcd.io/etcd/client/v3 v3.5.15
 	go.mongodb.org/mongo-driver v1.17.1
 	go.opentelemetry.io/otel v1.24.0
